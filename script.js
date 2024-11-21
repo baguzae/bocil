@@ -17,4 +17,9 @@ document.getElementById("open-invitation").addEventListener("click", function ()
   setTimeout(() => {
       window.location.href = "halaman-undangan.html";
   }, 500); // Delay untuk efek perpindahan
+
+  if (navigator.userAgent.includes("Safari") && !navigator.userAgent.includes("Chrome")) {
+    console.log("Detected Safari browser. Ensure user interaction for audio.");
+}
+
 });
