@@ -1,11 +1,21 @@
-// function playMusicAndRedirect() {
-//   const audio = document.getElementById('birthday-audio');
-//   audio.play(); // Mulai memutar musik
-//   setTimeout(() => {
-//       window.location.href = "home.html"; // Redirect setelah musik dimulai
-//   }, 500); // Delay sedikit agar musik mulai sebelum redirect
-// }
+document.addEventListener("DOMContentLoaded", function () {
+  const audio = document.getElementById("background-audio");
+  audio.muted = true; // Ini diperlukan untuk Safari autoplay
+  audio.play()
+      .then(() => {
+          console.log("Audio playing");
+      })
+      .catch(error => {
+          console.warn("Autoplay blocked: ", error);
+      });
+});
 
-const audio = document.getElementById('audioPlayer');
-        audio.onplay = () => alert("Audio is playing");
-        audio.onerror = () => alert("Audio failed to load");
+document.getElementById("unmute-audio").addEventListener("click", function () {
+  const audio = document.getElementById("background-audio");
+  if (audio) {
+      audio.muted = false;
+      audio.play()
+          .then(() => console.log("Audio unmuted and playing"))
+          .catch(error => console.error("Error playing audio:", error));
+  }
+});
