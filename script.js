@@ -1,21 +1,22 @@
 document.addEventListener("DOMContentLoaded", function () {
   const audio = document.getElementById("background-audio");
-  audio.muted = true; // Ini diperlukan untuk Safari autoplay
-  audio.play()
-      .then(() => {
-          console.log("Audio playing");
-      })
-      .catch(error => {
-          console.warn("Autoplay blocked: ", error);
-      });
-});
 
-document.getElementById("unmute-audio").addEventListener("click", function () {
-  const audio = document.getElementById("background-audio");
-  if (audio) {
+  // Pastikan audio autoplay
+  audio.play().catch(error => {
+      console.warn("Autoplay diblokir: ", error);
+  });
+
+  // Opsional: Tambahkan tombol untuk memulai jika autoplay diblokir
+  const unmuteButton = document.createElement("button");
+  unmuteButton.textContent = "Putar Audio";
+  unmuteButton.style.display = "block";
+  unmuteButton.style.margin = "20px auto";
+  document.body.appendChild(unmuteButton);
+
+  unmuteButton.addEventListener("click", function () {
       audio.muted = false;
-      audio.play()
-          .then(() => console.log("Audio unmuted and playing"))
-          .catch(error => console.error("Error playing audio:", error));
-  }
+      audio.play().then(() => {
+          unmuteButton.style.display = "none"; // Sembunyikan tombol setelah audio mulai
+      });
+  });
 });
