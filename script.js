@@ -1,3 +1,5 @@
+
+// Script audio
 document.addEventListener("DOMContentLoaded", function () {
   const audio = document.getElementById("background-music");
   const musicButton = document.getElementById("music-control");
@@ -32,6 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+// script input form
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("message-form");
   const nameInput = document.getElementById("name-input");
@@ -40,29 +43,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Memuat pesan yang sudah ada dari localStorage jika ada
   const loadMessages = () => {
-      const storedMessages = JSON.parse(localStorage.getItem("messages"));
-      if (storedMessages) {
-          storedMessages.forEach(message => {
-              const messageItem = document.createElement("div");
-              messageItem.classList.add("message-item");
+    const storedMessages = JSON.parse(localStorage.getItem("messages"));
+    if (storedMessages) {
+        const limitedMessages = storedMessages.slice(-50); // Hanya pesan terbaru (maksimal 50 pesan)
+        limitedMessages.forEach(message => {
+            const messageItem = document.createElement("div");
+            messageItem.classList.add("message-item");
 
-              const messageContent = `
-                  <p class="sender">${message.name}</p>
-                  <p>${message.text}</p>
-              `;
-              messageItem.innerHTML = messageContent;
+            const messageContent = `
+                <p class="sender">${message.name}</p>
+                <p>${message.text}</p>
+            `;
+            messageItem.innerHTML = messageContent;
 
-              messagesList.appendChild(messageItem);
-          });
-      }
-  };
+            messagesList.appendChild(messageItem);
+        });
+    }
+};
+
 
   // Menyimpan pesan ke localStorage
   const saveMessage = (name, message) => {
-      const storedMessages = JSON.parse(localStorage.getItem("messages")) || [];
-      storedMessages.push({ name, text: message });
-      localStorage.setItem("messages", JSON.stringify(storedMessages));
-  };
+    const storedMessages = JSON.parse(localStorage.getItem("messages")) || [];
+    if (!storedMessages.some(msg => msg.name === name && msg.text === message)) {
+        storedMessages.push({ name, text: message });
+        localStorage.setItem("messages", JSON.stringify(storedMessages));
+    }
+};
 
   // Menangani pengiriman form
   form.addEventListener("submit", function (event) {
@@ -95,6 +102,11 @@ document.addEventListener("DOMContentLoaded", function () {
           messageInput.value = "";
       }
   });
+
+  if (typeof Storage === "undefined") {
+    alert("Browser Anda tidak mendukung penyimpanan lokal (localStorage). Pesan tidak dapat disimpan.");
+    return;
+}
 
   // Memuat pesan saat halaman dimuat
   loadMessages();
