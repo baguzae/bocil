@@ -115,17 +115,54 @@
         </div>
 
         <div class="form-container mt-5">
-            <h2 class="mb-4">Pesan atau Do'a</h2>
-            <form id="message-form" class="mt-5">
-                <input type="text" id="name-input" class="input-field" placeholder="Nama" required>
-                <textarea id="message-input" class="input-field" placeholder="Pesan atau Do'a" required></textarea>
-                <button type="submit" class="submit-btn">Kirim</button>
+            <h2 class="mb-4 text-center">Pesan atau Do'a</h2>
+            <form id="message-form" class="mt-4">
+                <!-- Input Nama -->
+                <div class="form-group mb-3">
+                    <label for="name-input" class="form-label">Nama</label>
+                    <input 
+                        type="text" 
+                        id="name-input" 
+                        class="form-control input-field" 
+                        placeholder="Masukkan Nama Anda" 
+                        required
+                    >
+                </div>
+                <!-- Input Pesan -->
+                <div class="form-group mb-3">
+                    <label for="message-input" class="form-label">Pesan atau Do'a</label>
+                    <textarea 
+                        id="message-input" 
+                        class="form-control input-field" 
+                        placeholder="Tulis Pesan atau Do'a Anda" 
+                        rows="4" 
+                        required
+                    ></textarea>
+                </div>
+                <!-- Tombol Kirim -->
+                <div class="text-center">
+                    <button 
+                        type="submit" 
+                        class="btn btn-primary submit-btn">
+                        Kirim
+                    </button>
+                </div>
             </form>
+        
+            <!-- Garis Pembatas -->
             <hr class="mt-4">
-            <div id="messages-container">
+        
+            <!-- Kontainer Pesan -->
+            <div id="messages-container" class="mt-5">
                 <h3 class="text-center text-white">Pesan yang Terkirim</h3>
-                <div id="messages-list" class="mt-5"></div>
+                <div 
+                    id="messages-list" 
+                    class="mt-4 p-3 border rounded bg-light">
+                    <!-- Pesan akan ditampilkan di sini -->
+                </div>
             </div>
+        </div>
+        >
         </div>
     
         
