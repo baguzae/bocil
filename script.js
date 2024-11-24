@@ -34,82 +34,77 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-// script input form
 document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("message-form");
-    const nameInput = document.getElementById("name-input");
-    const messageInput = document.getElementById("message-input");
-    const messagesList = document.getElementById("messages-list");
-  
-    // Fungsi untuk memuat pesan dari localStorage
-    const loadMessages = () => {
-      const storedMessages = JSON.parse(localStorage.getItem("messages")) || [];
-      storedMessages.forEach((message) => {
-        const messageItem = document.createElement("div");
-        messageItem.classList.add("message-item");
-  
-        const messageContent = `
-          <p class="sender">${message.name}</p>
-          <p>${message.text}</p>
-        `;
-        messageItem.innerHTML = messageContent;
-        messagesList.appendChild(messageItem);
-      });
-  
-      // Scroll ke bawah jika ada pesan
-      if (storedMessages.length > 0) {
-        messagesList.scrollTop = messagesList.scrollHeight;
-      }
-    };
-  
-    // Fungsi untuk menyimpan pesan ke localStorage
-    const saveMessage = (name, message) => {
-      const storedMessages = JSON.parse(localStorage.getItem("messages")) || [];
-      storedMessages.push({ name, text: message }); // Tambahkan pesan baru
-      localStorage.setItem("messages", JSON.stringify(storedMessages)); // Simpan kembali ke localStorage
-    };
-  
-    // Menangani pengiriman form
-    form.addEventListener("submit", function (event) {
+  const form = document.getElementById("message-form");
+  const nameInput = document.getElementById("name-input");
+  const messageInput = document.getElementById("message-input");
+  const messagesList = document.getElementById("messages-list");
+
+  // Fungsi untuk memuat pesan dari server
+  const loadMessages = () => {
+      fetch("get_messages.php") // Ganti dengan file PHP untuk mengambil pesan
+          .then(response => response.json())
+          .then(messages => {
+              messagesList.innerHTML = ""; // Kosongkan pesan lama
+
+              messages.forEach((message) => {
+                  const messageItem = document.createElement("div");
+                  messageItem.classList.add("message-item");
+
+                  const messageContent = `
+                    <p class="sender">${message.name}</p>
+                    <p>${message.message}</p>
+                  `;
+                  messageItem.innerHTML = messageContent;
+                  messagesList.appendChild(messageItem);
+              });
+
+              // Scroll ke bawah setelah pesan baru
+              if (messages.length > 0) {
+                  messagesList.scrollTop = messagesList.scrollHeight;
+              }
+          })
+          .catch(error => console.error("Error loading messages:", error));
+  };
+
+  // Fungsi untuk mengirim pesan ke server
+  const sendMessage = (name, message) => {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("message", message);
+
+      fetch("submit_message.php", { // Ganti dengan file PHP untuk mengirim pesan
+          method: "POST",
+          body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              // Pesan berhasil disimpan, muat pesan lagi
+              loadMessages();
+          } else {
+              alert(data.message);
+          }
+      })
+      .catch(error => console.error("Error sending message:", error));
+  };
+
+  // Menangani pengiriman form
+  form.addEventListener("submit", function (event) {
       event.preventDefault(); // Mencegah reload halaman
-  
+
       const name = nameInput.value.trim();
       const message = messageInput.value.trim();
-  
+
       if (name && message) {
-        const messageItem = document.createElement("div");
-        messageItem.classList.add("message-item");
-  
-        const messageContent = `
-          <p class="sender">${name}</p>
-          <p>${message}</p>
-        `;
-        messageItem.innerHTML = messageContent;
-  
-        // Tambahkan pesan baru ke dalam daftar
-        messagesList.appendChild(messageItem);
-  
-        // Simpan pesan ke localStorage
-        saveMessage(name, message);
-  
-        // Scroll ke bawah setelah pesan baru
-        messagesList.scrollTop = messagesList.scrollHeight;
-  
-        // Kosongkan input setelah pengiriman
-        nameInput.value = "";
-        messageInput.value = "";
+          sendMessage(name, message); // Kirim pesan ke server
+          nameInput.value = "";
+          messageInput.value = "";
       } else {
-        alert("Nama dan pesan tidak boleh kosong!");
+          alert("Nama dan pesan tidak boleh kosong!");
       }
-    });
-  
-    // Periksa dukungan localStorage
-    if (typeof Storage === "undefined") {
-      alert("Browser Anda tidak mendukung penyimpanan lokal (localStorage). Pesan tidak dapat disimpan.");
-      return;
-    }
-  
-    // Muat pesan saat halaman dimuat
-    loadMessages();
   });
-  
+
+  // Muat pesan saat halaman dimuat
+  loadMessages();
+});

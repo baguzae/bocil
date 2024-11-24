@@ -1,39 +1,41 @@
 <?php
 // Koneksi ke database
-$servername = "localhost"; // Server database
-$username = "root";        // Username database (default: root)
-$password = "";            // Password database (default: kosong)
-$database = "database_undangan"; // Nama database
-
-// Buat koneksi
-$conn = new mysqli($servername, $username, $password, $database);
+$conn = new mysqli("localhost", "root", "", "undangan_digital");
 
 // Periksa koneksi
 if ($conn->connect_error) {
     die("Koneksi gagal: " . $conn->connect_error);
 }
 
-// Ambil data dari POST
-$name = $_POST['name'] ?? '';
-$message = $_POST['message'] ?? '';
+// Pastikan request adalah POST dan data yang dibutuhkan ada
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name']) && isset($_POST['message'])) {
+    // Ambil data dari request dan sanitasi
+    $name = trim($_POST['name']);
+    $message = trim($_POST['message']);
 
-// Validasi input
-if (!empty($name) && !empty($message)) {
-    // Gunakan prepared statement untuk keamanan
-    $stmt = $conn->prepare("INSERT INTO messages (name, text) VALUES (?, ?)");
-    $stmt->bind_param("ss", $name, $message);
-
-    // Eksekusi statement
-    if ($stmt->execute()) {
-        echo json_encode(["status" => "success", "message" => "Pesan berhasil disimpan!"]);
-    } else {
-        echo json_encode(["status" => "error", "message" => "Gagal menyimpan pesan."]);
+    // Pastikan input tidak kosong
+    if (empty($name) || empty($message)) {
+        echo json_encode(["success" => false, "message" => "Nama dan pesan tidak boleh kosong."]);
+        exit;
     }
 
+    // Insert pesan ke database menggunakan prepared statement
+    $sql = "INSERT INTO messages (name, message) VALUES (?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $name, $message);
+
+    if ($stmt->execute()) {
+        echo json_encode(["success" => true, "message" => "Pesan berhasil disimpan."]);
+    } else {
+        echo json_encode(["success" => false, "message" => "Gagal menyimpan pesan."]);
+    }
+
+    // Tutup statement dan koneksi
     $stmt->close();
 } else {
-    echo json_encode(["status" => "error", "message" => "Nama dan pesan tidak boleh kosong."]);
+    echo json_encode(["success" => false, "message" => "Data tidak valid atau metode request tidak sesuai."]);
 }
 
+// Tutup koneksi database
 $conn->close();
 ?>
